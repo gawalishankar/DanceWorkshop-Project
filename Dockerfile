@@ -26,27 +26,31 @@
 
 
 
-
+# Use official PHP + Apache image
 FROM php:8.2-apache
 
-# Enable Apache rewrite module
+# Enable Apache modules
 RUN a2enmod rewrite
 
-# Set Apache DocumentRoot to danceworkshop folder
-ENV APACHE_DOCUMENT_ROOT=/var/www/html
-
-# Install PHP extensions
+# Install PHP extensions needed for MySQL
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Copy project files
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application files
 COPY danceworkshop/ /var/www/html/
 
-# Fix permissions
+# Fix permissions (VERY IMPORTANT)
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Update Apache config to allow access
-RUN sed -i 's|/var/www/html|/var/www/html|g' /etc/apache2/sites-available/000-default.conf \
-    && sed -i 's|AllowOverride None|AllowOverride All|g' /etc/apache2/apache2.conf
+# Allow Apache to access files
+RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
+# Expose Apache port
 EXPOSE 80
+
+# Start Apache
+CMD ["apache2-foreground"]
+
