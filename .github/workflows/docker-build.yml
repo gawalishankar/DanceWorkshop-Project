@@ -40,13 +40,13 @@ jobs:
           docker tag danceworkshop:latest $IMAGE_URI
           docker push $IMAGE_URI
 
-      - name: Update ECS service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ecs-task-definition.json
-          service: dance-workshop-service
-          cluster: dance-workshop-cluster
-          wait-for-service-stability: true
+      # - name: Update ECS service
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: ecs-task-definition.json
+      #     service: dance-workshop-service
+      #     cluster: dance-workshop-cluster
+      #     wait-for-service-stability: true
 
       - name: Import SQL into RDS
         run: |
