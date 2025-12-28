@@ -14,7 +14,8 @@ RUN a2enmod rewrite
 RUN docker-php-ext-install mysqli
 
 # Set permissions for Apache (optional, depending on your app)
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
 
 # Expose port 80 for ECS load balancer
 EXPOSE 80
