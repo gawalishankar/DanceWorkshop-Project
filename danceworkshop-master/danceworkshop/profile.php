@@ -71,7 +71,16 @@
   <div id="home" class="intro route bg-image" style="background-image: url(img/home1.jpg);background-size: cover; ">
     <div class="overlay-itro"></div>
      <?php
-      $con=mysqli_connect('localhost','root','','dance');
+      $con = mysqli_connect(
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME")
+);
+
+if (!$con) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
       $pid=$_SESSION['uid'];
       $sql="SELECT * FROM workshop WHERE wshow='1'";
       $run=mysqli_query($con,$sql);

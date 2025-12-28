@@ -86,7 +86,15 @@
       </div>
       <div class="card-body bg-dark">
        <?php
-        $con=mysqli_connect('localhost','root','','dance');
+        $con = mysqli_connect(
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME")
+);
+  if (!$con) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
             $cid=$_SESSION['cid'];
           $sql="SELECT * FROM coach WHERE cid='$cid'";
            $run=mysqli_query($con,$sql);
