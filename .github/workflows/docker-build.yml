@@ -52,6 +52,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mysql-client
+          mysql -h $DB_HOST -u $DB_USER -p$DB_PASS -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
           mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < danceworkshop-master/danceworkshop/dance.sql
 
 
