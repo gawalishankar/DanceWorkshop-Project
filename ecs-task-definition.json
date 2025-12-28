@@ -4,7 +4,7 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::<216430538400>:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::216430538400:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "dance-workshop",
