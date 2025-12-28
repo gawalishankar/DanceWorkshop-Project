@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ECR_REPOSITORY: dance-workshop
+      ECR_REPOSITORY: danceworkshop
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       DB_HOST: ${{ secrets.DB_HOST }}
