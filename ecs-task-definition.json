@@ -4,11 +4,11 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::<216430538400>:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "dance-workshop",
-      "image": "<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/dance-workshop:latest",
+      "image": "<216430538400>.dkr.ecr.<us-east-2>.amazonaws.com/dance-workshop:latest",
       "portMappings": [
         { "containerPort": 80, "protocol": "tcp" }
       ],
