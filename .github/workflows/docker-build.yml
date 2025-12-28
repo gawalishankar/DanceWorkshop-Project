@@ -36,7 +36,7 @@ jobs:
       - name: Build, tag, and push Docker image to ECR
         run: |
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest
-          docker build -t dance-workshop ./danceworkshop
+          docker build -t dance-workshop .
           docker tag dance-workshop:latest $IMAGE_URI
           docker push $IMAGE_URI
 
