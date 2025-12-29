@@ -1,58 +1,87 @@
-name: Build and Deploy to ECS with DB Import
+name: CI - Build Image, Push to ECR, Import Database
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-push-import:
     runs-on: ubuntu-latest
 
-    env:
-      ECR_REPOSITORY: danceworkshop
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASS: ${{ secrets.DB_PASS }}
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # ----------------------------------
+      # Step 1: Checkout source code
+      # ----------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      # ----------------------------------
+      # Step 2: Configure AWS credentials
+      # ----------------------------------
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+      # ----------------------------------
+      # Step 3: Login to Amazon ECR
+      # ----------------------------------
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push Docker image to ECR
+      # ----------------------------------
+      # Step 4: Build Docker image
+      # ----------------------------------
+      - name: Build Docker image
         run: |
-          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest
-          docker build -t danceworkshop .
-          docker tag danceworkshop:latest $IMAGE_URI
-          docker push $IMAGE_URI
+          docker build -t ${{ secrets.ECR_REPOSITORY }} .
 
-      # - name: Update ECS service
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      #   with:
-      #     task-definition: ecs-task-definition.json
-      #     service: dance-workshop-service
-      #     cluster: dance-workshop-cluster
-      #     wait-for-service-stability: true
+      # ----------------------------------
+      # Step 5: Tag Docker image
+      # ----------------------------------
+      - name: Tag Docker image
+        run: |
+          docker tag ${{ secrets.ECR_REPOSITORY }}:latest \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
-      - name: Import SQL into RDS
+      # ----------------------------------
+      # Step 6: Push Docker image to ECR
+      # ----------------------------------
+      - name: Push Docker image to Amazon ECR
+        run: |
+          docker push \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+
+      # ----------------------------------
+      # Step 7: Install MySQL client
+      # ----------------------------------
+      - name: Install MySQL client
         run: |
           sudo apt-get update
           sudo apt-get install -y mysql-client
-          mysql -h $DB_HOST -u $DB_USER -p$DB_PASS -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
-          mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < danceworkshop-master/danceworkshop/dance.sql
+
+      # ----------------------------------
+      # Step 8: Import database (UPDATED PATH)
+      # ----------------------------------
+      - name: Import MySQL database
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          echo "Importing database from dance.sql..."
+          mysql \
+            -h "$DB_HOST" \
+            -P "$DB_PORT" \
+            -u "$DB_USER" \
+            -p"$DB_PASSWORD" \
+            "$DB_NAME" < danceworkshop-master/danceworkshop/dance.sql
+
 
 
